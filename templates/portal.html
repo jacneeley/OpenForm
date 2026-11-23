@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page %}{% endblock %}
+{% block content %}
+<div class="md-typeset">
+    <h2>Admin Portal</h2>
+    <button class="pytx-button" style="max-width: 15%; margin-bottom:1rem; float: right;">Download</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Choice</th>
+                <th>Votes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k,v in choices.items() %}
+                <tr>
+                    <td>{{k}}</td>
+                    <td>{{v}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

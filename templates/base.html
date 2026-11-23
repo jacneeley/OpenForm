@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-md-color-scheme="pytx2027" data-md-color-primary="indigo" data-md-color-accent="indigo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', path='/styles.css')}}">
+    <title>Voting App</title>
+</head>
+<body class="pytx-container">
+    <div class="container">
+        <header class="md-header md-header--lifted" data-md-component="header">
+            <h1>PyTexas 2027 Conference Voting</h1>
+            <hr/>
+        </header>
+        <main>
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+        <footer>
+            <p>Copyright PyTexas 2026 - All Rights Reserved</p>
+        </footer>
+    </div>
+    
+</body>
+<style>
+    html, body { padding: 0 ; margin: 0 }
+
+    body{
+        width: 70%;
+        display: block;
+        margin: 0 auto;
+    }
+
+    header, main, footer {
+        margin: 0; 
+        display: block;
+    }
+
+    header{
+        height: 20%;
+    }
+
+    main { flex: 1; }
+
+    footer {
+        height: 20%;
+    }
+
+    .container{
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+</style>
+</html>

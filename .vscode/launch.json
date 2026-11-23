@@ -1,0 +1,19 @@
+{
+    // this is here if you would like to debug with vscode.
+    // if you prefer to gitignore .vscode then oh well.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Server",
+            "module": "uvicorn",
+            "type": "debugpy",
+            "request": "launch",
+            "args": [
+                "main:app",
+                "--reload",
+                "--port",
+                "8000"
+            ]
+        }
+    ]
+}

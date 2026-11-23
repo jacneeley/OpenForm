@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block page %}{% endblock %}
+{% block content %}
+<div class="">
+    {% if choices %}
+    <form action="#" method="post">
+        <p>Make a selection:</p>
+        {% for choice in choices %}
+            <input type="radio" id="choice_{{loop.index0}}" name="choice" value="{{choice}}" required>
+            <label for="choice">{{choice}}</label>
+            <br>
+        {% endfor %}
+        <div class="form-btns">
+            <input class="pytx-button" type="reset" value="Clear" >
+            <input class="pytx-button pytx-button--primary" type="submit" value="Submit">
+        </div>
+    </form>
+    {% else %}
+    <div>
+        <p>something went wrong and the form could not be loaded...</p>
+    </div>
+    {% endif %}
+</div>
+<style>
+    .form-btns{
+            width: 50%;
+            float:none;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            margin: 2rem auto;
+    }
+</style>
+{% endblock %}

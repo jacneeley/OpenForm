@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block page %}{% endblock %}
+{% block content %}
+<div class="">
+    <form action="#" method="post">
+         <label for="username">username: <input id="username" type="text" name="username" required></label>
+         <label for="password">password: <input id="password" type="password" name="password" required></label>
+
+         <div class="form-btns">
+            <input class="pytx-button" type="reset" value="Clear" >
+            <input class="pytx-button pytx-button--primary" type="submit" value="Login">
+        </div>
+    </form>
+</div>
+<style>
+    .form-btns{
+            width: 50%;
+            float:none;
+            display: flex;
+            flex-direction: row;
+            margin: 2rem auto;
+    }
+
+    .form-btns .pytx-button{
+        width: 25% !important;
+    }
+</style>
+{% endblock %}
