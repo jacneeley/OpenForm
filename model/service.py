@@ -1,37 +1,34 @@
 """This will handle redis logic"""
 
+import logging
+from datetime import datetime, timezone
 from base64 import b64encode
+from model.models import Choices
 from model import repo
 
-"""
-TODO: 
-    '__cache' will get removed after redis is added.
-    so uses of 'global' and associated checks will go with it.
-
-"redis" lol
-"""
-__cache = {"A": 0, "B": 0}
+logger = logging.getLogger("ServiceLogger")
+logger.setLevel(logging.DEBUG)
+TIME_FORMAT = "%m-%d-%Y"
+logger.addHandler(logging.FileHandler(
+    f".logs/{datetime.today().strftime(TIME_FORMAT)}.log"))
 
 
-def get_choices(full: bool = False) -> list[str]:
-    global __cache
-    if not __cache:
-        __cache = repo.get_choices()
+def get_choices(session, full: bool = False) -> list[Choices]:
+
+    response = repo.get_choices(session)
 
     if full:
-        return __cache
+        return response
 
-    return __cache.keys() if __cache.keys() else []
+    return [c.choice for c in response]
 
 
-def submit_choice(choice: str = ""):
+def submit_choice(session, choice: str = ""):
     try:
-        global __cache
-        __cache[choice] = __cache.get(choice, 0) + 1
-        return repo.submit_choice(__cache)
+        return repo.submit_choice(session, choice)
     except Exception as e:
-        print(e)
-        return False
+        logger.error("%s - ERROR: %s", datetime.now(timezone.utc), str(e))
+        raise e
 
 
 def submit_login(auth: dict[str, str], enc: str) -> bool:
@@ -43,25 +40,62 @@ def submit_login(auth: dict[str, str], enc: str) -> bool:
             auth['username'].encode(enc)).decode(enc)
         auth['password'] = b64encode(
             auth['password'].encode(enc)).decode(enc)
+        auth['user_addr'] = b64encode(
+            auth['user_addr'].encode(enc)).decode(enc)
+
+        logger.info("%s - INFO: Log in attempt: %s",
+                    datetime.now(timezone.utc), auth)
 
         return repo.submit_auth(auth)
     except Exception as e:
-        print(e)
+        logger.error("%s - ERROR: %s", datetime.now(timezone.utc), str(e))
         return False
 
 
-def mng_client_host(cip: str, enc: str, get: bool = False) -> bool:
+def mng_client_host(session, cip: str, enc: str, choice: str = "", get: bool = False) -> bool:
     try:
         if not cip:
             return False
 
         crypt = b64encode(cip.encode(enc)).decode(enc)
 
-        if get:
-            return repo.get_client_ip(crypt)
+        if get and not choice:
+            logger.info("%s - INFO: fetching %s",
+                        datetime.now(timezone.utc), crypt)
+            return repo.get_client_ip(crypt, session)
 
-        return repo.log_client_host(crypt)
+        if choice:
+            logger.info("%s - INFO: incoming submission - %s",
+                        datetime.now(timezone.utc), {crypt, choice})
+            return repo.log_client_host(crypt, choice, session)
+
+        return False
 
     except Exception as e:
-        print(e)
+        logger.error("%s - ERROR: %s", datetime.now(timezone.utc), str(e))
         return False
+
+
+def rollback(transaction, session):
+    try:
+        enc = transaction['enc']
+        transaction['user_addr'] = b64encode(
+            transaction['user_addr'].encode(enc)).decode(enc)
+        repo.rollback(session)
+        logger.info("rolling back @ %s - Transaction: %s",
+                    datetime.now(timezone.utc), transaction)
+
+    except Exception as e:
+        logger.error("%s - ERROR: %s", datetime.now(timezone.utc), str(e))
+        raise e
+
+
+def commit(session):
+    try:
+        logger.info(
+            "committing and refreshing db @ %s", datetime.now(timezone.utc))
+        repo.commit_and_refresh(session)
+        logger.info("refresh complete.")
+    except Exception as e:
+        logger.error("%s - ERROR: %s", datetime.now(timezone.utc), str(e))
+        raise e
