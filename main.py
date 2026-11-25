@@ -17,7 +17,7 @@ from sqlmodel import Session
 from starlette.middleware.sessions import SessionMiddleware
 import starlette.status as status
 
-from model.service import submit_choice, get_choices, submit_login, mng_client_host, rollback, commit
+from model.service import submit_choice, get_choices, submit_login, mng_client_host, rollback, commit, show_log
 from model.models import startup_engine, get_session
 
 load_dotenv()
@@ -66,6 +66,10 @@ async def auth_login(request: Request, form: OAuth2PasswordRequestForm = Depends
             raise HTTPException(status_code=401, detail="Invalid Credentials")
         request.session['active_user'] = form.username
 
+    if "return_to" in request.session:
+        return_to = request.session.get("return_to", "")
+        RedirectResponse(url=request.url_for(return_to),
+                         status_code=status.HTTP_302_FOUND)
     return RedirectResponse(url=request.url_for("portal"), status_code=status.HTTP_302_FOUND)
 
 
@@ -121,3 +125,24 @@ async def success(request: Request):
 @app.get("/error", response_class=HTMLResponse)
 async def error(request: Request):
     return templates.TemplateResponse(request=request, name="error.html")
+
+
+@app.get("/log/{log_file}")
+async def show_log_file(request: Request, log_file: str | None = None):
+    if 'user_addr' not in request.session:
+        request.session['return_to'] = f'/log/{log_file}'
+        return RedirectResponse(url=request.url_for("login"), status_code=status.HTTP_302_FOUND)
+
+    return show_log(log_file)
+
+
+@app.get("/show_logs", response_class=HTMLResponse)
+async def show_logs(request: Request):
+    # TODO: just show all of the log files in a <ul> with <a> tags opening the file on click.
+    pass
+
+
+@app.get("/download")
+async def download_form(request: Request):
+    # TODO: allow admins to download submission data as csv
+    pass

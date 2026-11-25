@@ -1,5 +1,6 @@
 """This will handle redis logic"""
 
+import os
 import logging
 from datetime import datetime, timezone
 from base64 import b64encode
@@ -74,6 +75,32 @@ def mng_client_host(session, cip: str, enc: str, choice: str = "", get: bool = F
     except Exception as e:
         logger.error("%s - ERROR: %s", datetime.now(timezone.utc), str(e))
         return False
+
+
+def show_log(log_file: str | None = None):
+    try:
+        if not log_file:
+            raise ValueError("No Log File Was Given.")
+
+        if not os.path.isfile(f".logs/{log_file}.log"):
+            return "Log File Was Not Found..."
+
+        # filenames = os.walk(".logs")[2]
+        # f_loc = 0
+        # for i,f in enumerate(filenames):
+        #     if log_file == f:
+        #         f_loc = i
+        #         break
+
+        log_for_day = []
+        with open(file=f".logs/{log_file}.log", OpenTextMode="r", encoding="UTF-8") as f:
+            log_for_day = f.readlines()
+
+        return "\n".join(log_for_day)
+
+    except Exception as e:
+        logger.error("%s - ERROR: %s", datetime.now(timezone.utc), str(e))
+        return "An Error Occurred Attempting To Read Log File."
 
 
 def rollback(transaction, session):
