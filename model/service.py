@@ -1,4 +1,4 @@
-"""\"Business\" Logic. Whatever that means."""
+""""Business" Logic. Whatever that means."""
 
 import os
 import logging
@@ -84,13 +84,6 @@ def show_log(log_file: str | None = None):
 
         if not os.path.isfile(f".logs/{log_file}.log"):
             return "Log File Was Not Found..."
-
-        # filenames = os.walk(".logs")[2]
-        # f_loc = 0
-        # for i,f in enumerate(filenames):
-        #     if log_file == f:
-        #         f_loc = i
-        #         break
 
         log_for_day = []
         with open(file=f".logs/{log_file}.log", OpenTextMode="r", encoding="UTF-8") as f:
