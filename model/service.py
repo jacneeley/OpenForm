@@ -1,4 +1,4 @@
-"""This will handle redis logic"""
+"""\"Business\" Logic. Whatever that means."""
 
 import os
 import logging
